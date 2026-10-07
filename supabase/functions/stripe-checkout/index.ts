@@ -37,6 +37,7 @@ Deno.serve(async (req) => {
     if (!origin) return json({ error: "Missing origin" }, 400);
 
     const { createClient } = await import(
+      // @ts-ignore
       "https://esm.sh/@supabase/supabase-js@2"
     );
     // Service role: guests have no RLS read access to product prices.

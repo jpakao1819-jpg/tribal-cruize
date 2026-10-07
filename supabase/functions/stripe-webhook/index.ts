@@ -87,6 +87,7 @@ Deno.serve(async (req) => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
+  // @ts-ignore
   const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
   const svc = createClient(
     Deno.env.get("SUPABASE_URL")!,

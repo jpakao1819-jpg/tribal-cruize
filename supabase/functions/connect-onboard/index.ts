@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
     if (!token) return json({ error: "Sign in required" }, 401);
 
     const { createClient } = await import(
+      // @ts-ignore
       "https://esm.sh/@supabase/supabase-js@2"
     );
     const sb = createClient(
