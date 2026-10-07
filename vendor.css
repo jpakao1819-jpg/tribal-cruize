@@ -1,0 +1,141 @@
+/* Tribal Cruize — vendor dashboard --------------------------------------- */
+
+.vendor-main { padding: 2.2rem 0 4rem; min-height: 70vh; }
+
+.auth-gate { display: flex; justify-content: center; padding: 3rem 0; }
+.auth-card { width: min(440px, 100%); }
+.auth-card h1 { font-size: 2.4rem; }
+.auth-actions { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
+.auth-error {
+  color: var(--err);
+  font-size: 0.85rem;
+  background: rgba(255, 123, 107, 0.08);
+  border: 1px solid rgba(255, 123, 107, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+/* --- header -------------------------------------------------------------- */
+.dash-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.4rem;
+}
+.dash-head h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); margin-bottom: 0.2em; }
+.dash-actions { display: flex; gap: 0.6rem; }
+.dash-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* --- tabs ---------------------------------------------------------------- */
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+}
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-panel h3 { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.05em; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.panel-head h3 { margin: 0; }
+.panel-actions { display: flex; gap: 0.7rem; margin-top: 1rem; flex-wrap: wrap; }
+.hint { color: var(--accent); font-size: 0.85rem; margin-top: 0.9rem; }
+
+/* --- logo / image upload ------------------------------------------------- */
+.logo-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.logo-row img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.logo-row input[type="file"] { font-size: 0.85rem; }
+
+/* --- product form / list ------------------------------------------------- */
+.product-form {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.1rem;
+  margin-bottom: 1.3rem;
+}
+
+.product-list { display: grid; gap: 0.8rem; }
+.product-row {
+  display: grid;
+  grid-template-columns: 58px 1fr auto auto;
+  gap: 0.9rem;
+  align-items: center;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+}
+.product-row img {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--panel);
+}
+.product-row .pr-title { font-weight: 600; font-size: 0.95rem; }
+.product-row .pr-meta { font-size: 0.78rem; color: var(--muted); }
+.product-row .pr-price { color: var(--accent); font-weight: 700; font-size: 0.92rem; }
+.product-row .pr-actions { display: flex; gap: 0.4rem; }
+
+@media (max-width: 640px) {
+  .product-row { grid-template-columns: 58px 1fr; }
+  .product-row .pr-price, .product-row .pr-actions { grid-column: 2; }
+}
+
+/* --- orders -------------------------------------------------------------- */
+.orders-table { display: grid; gap: 0.6rem; }
+.order-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+.order-row .o-amount { font-weight: 700; color: var(--accent); }
+.order-row .o-meta { color: var(--muted); font-size: 0.78rem; }
+
+@media (max-width: 640px) {
+  .order-row { grid-template-columns: 1fr auto; }
+}
+
+/* --- space panel --------------------------------------------------------- */
+.space-info-box {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.1rem 1.3rem;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+.space-info-box strong { color: var(--ink); }

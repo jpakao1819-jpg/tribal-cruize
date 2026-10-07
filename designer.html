@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Studio | Tribal Cruize</title>
+  <meta name="description" content="Design custom clothing with AI — tees, hoodies, caps, bags and full outfits." />
+
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="tc.css" />
+  <link rel="stylesheet" href="designer.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home">
+        <img src="assets/logo.png" alt="Tribal Cruize logo" />
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="tribal-cruize.html">Home</a></li>
+        <li><a href="designer.html" class="active">Designer</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="spaces.html">Sell With Us</a></li>
+        <li><button class="button btn-sm" id="settingsBtn">Settings</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="designer-layout">
+    <!-- Left rail: garment templates -->
+    <aside class="tool-rail" id="toolRail" aria-label="Garment templates"></aside>
+
+    <!-- Center: canvas -->
+    <section class="canvas-area">
+      <div class="canvas-toolbar">
+        <div>
+          <p class="eyebrow" style="margin:0">Design Studio</p>
+          <h1 id="garmentTitle">T-Shirt</h1>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-sm" id="mode3dBtn" title="Toggle the 3D fashion mannequin">3D Mannequin</button>
+          <button class="btn btn-sm" id="undoBtn" title="Reset placement">Reset art</button>
+          <button class="btn btn-sm btn-danger" id="clearArtBtn">Remove art</button>
+        </div>
+      </div>
+
+      <div class="canvas-stage" id="flatStage">
+        <div class="canvas-box" id="canvasBox"></div>
+      </div>
+
+      <div class="canvas-stage mannequin-stage" id="mannequinStage" hidden>
+        <div id="mannequinCanvas"></div>
+        <div class="mannequin-hint">Drag to rotate · scroll to zoom</div>
+      </div>
+
+      <div class="preset-row" id="presetRow">
+        <span class="muted small">Place:</span>
+        <button class="btn btn-sm" data-preset="left">Left chest</button>
+        <button class="btn btn-sm" data-preset="center">Center chest</button>
+        <button class="btn btn-sm" data-preset="full">Full front</button>
+      </div>
+
+      <div class="preset-row" id="mannequinRow" hidden>
+        <span class="muted small">View:</span>
+        <button class="btn btn-sm" data-view="front">Front</button>
+        <button class="btn btn-sm" data-view="back">Back</button>
+        <button class="btn btn-sm" data-view="side">Side</button>
+        <button class="btn btn-sm" id="spinBtn">Auto-rotate</button>
+        <span class="muted small" style="margin-left:0.6rem">Export:</span>
+        <button class="btn btn-sm" id="exportGlb">GLB</button>
+        <button class="btn btn-sm" id="exportObj">OBJ</button>
+        <button class="btn btn-sm" id="exportPng3d">PNG</button>
+      </div>
+    </section>
+
+    <!-- Right: properties -->
+    <aside class="props-panel">
+      <section class="props-section">
+        <h3>1 · Generate artwork</h3>
+        <div class="form-group">
+          <label for="promptInput">Describe your design</label>
+          <textarea id="promptInput" rows="3" placeholder="e.g. a tribal cruising eagle with geometric mandala wings"></textarea>
+        </div>
+        <div class="chip-row" id="styleChips">
+          <button class="chip active" data-style="Tribal">Tribal</button>
+          <button class="chip" data-style="Streetwear">Streetwear</button>
+          <button class="chip" data-style="Geometric">Geometric</button>
+          <button class="chip" data-style="Animal">Animal</button>
+          <button class="chip" data-style="Skull">Skull</button>
+        </div>
+        <div class="props-actions">
+          <button class="btn btn-primary" id="generateBtn">✨ Generate design</button>
+          <button class="btn" id="uploadBtn">Upload image</button>
+          <input type="file" id="uploadInput" accept="image/*" hidden />
+        </div>
+        <p class="gen-error" id="genError" hidden></p>
+        <p class="muted small">Powered by a free image API — or add your own OpenAI key in Settings for premium quality.</p>
+      </section>
+
+      <section class="props-section">
+        <h3>2 · Garment colors</h3>
+        <div id="colorControls"></div>
+      </section>
+
+      <section class="props-section" id="placementSection" hidden>
+        <h3>3 · Placement</h3>
+        <div class="form-group">
+          <label>Size <span id="sizeVal" class="muted"></span></label>
+          <input type="range" id="sizeRange" min="0.2" max="1.6" step="0.02" value="0.85" />
+        </div>
+        <div class="form-group">
+          <label>Rotation <span id="rotVal" class="muted"></span></label>
+          <input type="range" id="rotRange" min="-180" max="180" step="1" value="0" />
+        </div>
+        <div class="form-group">
+          <label>Opacity <span id="opacityVal" class="muted"></span></label>
+          <input type="range" id="opacityRange" min="0.1" max="1" step="0.05" value="1" />
+        </div>
+        <label class="check-row">
+          <input type="checkbox" id="flipCheck" />
+          <span>Flip horizontally</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="bgKeyCheck" checked />
+          <span>Remove background (blends art onto fabric)</span>
+        </label>
+        <div class="form-group" id="toleranceWrap">
+          <label>Background tolerance <span id="tolVal" class="muted"></span></label>
+          <input type="range" id="tolRange" min="0" max="120" step="2" value="44" />
+        </div>
+        <p class="muted small">Drag the artwork directly on the garment to reposition it.</p>
+      </section>
+
+      <section class="props-section" id="mannequinSection" hidden>
+        <h3>3D mannequin</h3>
+        <p class="muted small">
+          Neutral full-body figure in a relaxed stance — matte light-gray,
+          untextured, ready to draw designs over.
+        </p>
+        <div class="form-group">
+          <label>Height <span id="mHeightVal" class="muted"></span></label>
+          <input type="range" id="mHeight" min="0.9" max="1.15" step="0.01" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Shoulders <span id="mShouldersVal" class="muted"></span></label>
+          <input type="range" id="mShoulders" min="0.8" max="1.3" step="0.01" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Hips <span id="mHipsVal" class="muted"></span></label>
+          <input type="range" id="mHips" min="0.8" max="1.3" step="0.01" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Limb thickness <span id="mLimbsVal" class="muted"></span></label>
+          <input type="range" id="mLimbs" min="0.75" max="1.35" step="0.01" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Arm spread <span id="mArmsVal" class="muted"></span></label>
+          <input type="range" id="mArms" min="0" max="30" step="1" value="12" />
+        </div>
+        <div class="form-group">
+          <label>Stance width <span id="mStanceVal" class="muted"></span></label>
+          <input type="range" id="mStance" min="0" max="20" step="1" value="8" />
+        </div>
+        <p class="muted small">
+          Export GLB or OBJ for use in any 3D tool, or PNG for drawing overlays.
+        </p>
+      </section>
+
+      <section class="props-section">
+        <h3>4 · Save &amp; export</h3>
+        <div class="form-group">
+          <label for="designName">Design name</label>
+          <input type="text" id="designName" placeholder="My tribal cruise tee" />
+        </div>
+        <div class="props-actions">
+          <button class="btn" id="saveBtn">Save design</button>
+          <button class="btn btn-primary" id="exportBtn">⬇ Download PNG</button>
+        </div>
+        <div class="divider"></div>
+        <h4 class="small-label">Saved designs</h4>
+        <ul class="save-list" id="saveList"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Settings modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <h3>Settings</h3>
+      <div class="form-group">
+        <label for="openaiKey">OpenAI API key (optional)</label>
+        <input type="password" id="openaiKey" placeholder="sk-..." autocomplete="off" />
+        <p class="muted small">
+          Stored only in this browser and sent only to api.openai.com. Leave empty to
+          use the free keyless image service.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="clearKeyBtn">Clear key</button>
+        <button class="btn" id="closeSettingsBtn">Close</button>
+        <button class="btn btn-primary" id="saveKeyBtn">Save key</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p>
+      <div>
+        <a href="designer.html">Designer</a>
+        <a href="shop.html">Shop</a>
+        <a href="spaces.html">Sell With Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="tc.js"></script>
+  <script src="designer.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="mannequin.js"></script>
+</body>
+</html>

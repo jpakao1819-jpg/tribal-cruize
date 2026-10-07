@@ -1,0 +1,172 @@
+/* Tribal Cruize — shop ---------------------------------------------------- */
+
+.shop-main { padding: 2.2rem 0 4rem; }
+
+.shop-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.shop-head h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 0.2em; }
+
+.success-banner {
+  background: rgba(125, 216, 125, 0.1);
+  border: 1px solid rgba(125, 216, 125, 0.4);
+  color: var(--ok);
+  border-radius: 12px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+.back-link:hover { color: var(--ink); }
+
+/* --- store cards --------------------------------------------------------- */
+.store-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+.store-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.store-card img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--panel-2);
+  width: 100%;
+}
+.store-card h3 { margin: 0; font-size: 1.02rem; }
+.store-card p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+/* --- storefront banner --------------------------------------------------- */
+.store-banner {
+  display: flex;
+  gap: 1.4rem;
+  align-items: center;
+  margin-bottom: 1.8rem;
+  flex-wrap: wrap;
+}
+.store-banner img {
+  width: 88px;
+  height: 88px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: var(--panel-2);
+}
+.store-banner .banner-text { flex: 1; min-width: 220px; }
+.store-banner h2 { margin-bottom: 0.15em; }
+.store-banner p { color: var(--muted); margin: 0; }
+
+/* --- product cards ------------------------------------------------------- */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.product-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.product-card img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--panel-2);
+  width: 100%;
+}
+.product-card .p-title { font-weight: 600; font-size: 0.95rem; }
+.product-card .p-price { color: var(--accent); font-weight: 700; font-size: 0.95rem; }
+.product-card .p-store { font-size: 0.78rem; color: var(--muted); }
+
+.product-modal img {
+  width: 100%;
+  aspect-ratio: 1.4;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  background: var(--panel-2);
+}
+.product-modal h3 { font-family: var(--font-display); font-size: 1.7rem; letter-spacing: 0.04em; }
+.product-modal .p-price { color: var(--accent); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
+.product-modal .p-desc { color: var(--muted); font-size: 0.92rem; }
+
+/* --- cart drawer --------------------------------------------------------- */
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(400px, 100vw);
+  height: 100vh;
+  background: var(--bg-2);
+  border-left: 1px solid var(--line);
+  transform: translateX(105%);
+  transition: transform 0.25s ease;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+}
+.cart-drawer.open { transform: translateX(0); }
+
+.cart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.3rem;
+  border-bottom: 1px solid var(--line);
+}
+.cart-head h3 { font-family: var(--font-display); font-size: 1.4rem; margin: 0; letter-spacing: 0.05em; }
+
+.cart-items { flex: 1; overflow-y: auto; padding: 1rem 1.3rem; display: flex; flex-direction: column; gap: 0.8rem; }
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.6rem;
+}
+.cart-item img { width: 54px; height: 54px; object-fit: cover; border-radius: 7px; background: var(--panel-2); }
+.cart-item .ci-title { font-size: 0.86rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cart-item .ci-store { font-size: 0.72rem; color: var(--muted); }
+.cart-item .ci-right { text-align: right; font-size: 0.85rem; }
+.qty-row { display: inline-flex; gap: 0.35rem; align-items: center; margin-top: 0.25rem; }
+.qty-row button {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.qty-row .remove-btn { color: var(--err); margin-left: 0.3rem; width: auto; padding: 0 0.35rem; }
+
+.cart-count {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 20px;
+}
+
+.cart-foot { border-top: 1px solid var(--line); padding: 1.1rem 1.3rem; }
+.cart-total { display: flex; justify-content: space-between; margin-bottom: 0.9rem; font-size: 1.05rem; }
+.cart-empty { color: var(--muted); font-size: 0.9rem; text-align: center; padding: 2rem 0; }

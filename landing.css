@@ -1,0 +1,114 @@
+/* Tribal Cruize — landing ------------------------------------------------- */
+
+.hero {
+  padding: clamp(3rem, 8vw, 6.5rem) 0;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(255, 107, 53, 0.14), transparent 55%),
+    radial-gradient(ellipse at 10% 90%, rgba(201, 162, 39, 0.08), transparent 50%);
+  overflow: hidden;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero-logo {
+  width: min(430px, 82%);
+  display: block;
+  margin-bottom: 1.4rem;
+}
+
+.hero h1 { margin-bottom: 0.4em; }
+
+.hero-sub {
+  color: var(--muted);
+  font-size: 1.1rem;
+  max-width: 46ch;
+  margin-bottom: 1.8rem;
+}
+
+.hero-actions { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+.hero-art {
+  position: relative;
+  min-height: 340px;
+}
+
+.hero-card {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  padding: 1.4rem 1.6rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.card-1 {
+  background: #efe7d9;
+  color: #14100c;
+  top: 8%;
+  left: 6%;
+  transform: rotate(-6deg);
+}
+.card-2 {
+  background: #1b1a17;
+  color: var(--accent);
+  top: 38%;
+  right: 4%;
+  transform: rotate(5deg);
+}
+.card-3 {
+  background: var(--accent);
+  color: #14100c;
+  bottom: 6%;
+  left: 18%;
+  transform: rotate(-2deg);
+}
+
+.feature { display: flex; flex-direction: column; gap: 0.4rem; }
+.feature-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.feature .btn { margin-top: auto; align-self: flex-start; }
+
+.steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: grid;
+  gap: 1rem;
+}
+.steps li {
+  counter-increment: step;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem 1.2rem 1rem 4rem;
+  position: relative;
+  color: var(--muted);
+}
+.steps li strong { color: var(--ink); }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-art { min-height: 260px; }
+}

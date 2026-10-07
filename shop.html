@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop | Tribal Cruize</title>
+  <meta name="description" content="Browse independent storefronts on the Tribal Cruize marketplace." />
+
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="tc.css" />
+  <link rel="stylesheet" href="shop.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home">
+        <img src="assets/logo.png" alt="Tribal Cruize logo" />
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="tribal-cruize.html">Home</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="shop.html" class="active">Shop</a></li>
+        <li><a href="spaces.html">Sell With Us</a></li>
+        <li>
+          <button class="button btn-sm" id="cartBtn">
+            Cart <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container shop-main">
+    <div id="successBanner" class="success-banner" hidden></div>
+
+    <!-- Directory view -->
+    <section id="directoryView">
+      <div class="shop-head">
+        <div>
+          <p class="eyebrow">Marketplace</p>
+          <h1>Independent storefronts</h1>
+          <p class="muted">Every space below is purchased and run by a brand on Tribal Cruize.</p>
+        </div>
+        <input type="search" id="storeSearch" placeholder="Search brands…" style="max-width:260px" />
+      </div>
+      <div class="grid grid-4" id="storeGrid"></div>
+      <div class="empty-state" id="storeEmpty" hidden>No storefronts yet — be the first to <a href="spaces.html" style="color:var(--accent)">buy a space</a>.</div>
+    </section>
+
+    <!-- Storefront view -->
+    <section id="storeView" hidden>
+      <a href="shop.html" class="back-link">← All storefronts</a>
+      <div class="store-banner card" id="storeBanner"></div>
+      <div class="grid grid-4" id="productGrid"></div>
+      <div class="empty-state" id="productEmpty" hidden>This storefront has no products yet.</div>
+    </section>
+  </main>
+
+  <!-- Product modal -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal product-modal">
+      <div id="productModalBody"></div>
+      <div class="modal-actions">
+        <button class="btn" id="closeProductBtn">Close</button>
+        <button class="btn btn-primary" id="addToCartBtn">Add to cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart drawer -->
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+    <div class="cart-head">
+      <h3>Your cart</h3>
+      <button class="btn btn-sm" id="closeCartBtn">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot">
+      <div class="cart-total">
+        <span class="muted">Total</span>
+        <strong id="cartTotal">$0.00</strong>
+      </div>
+      <div class="form-group">
+        <label for="checkoutEmail">Email for your receipt</label>
+        <input type="email" id="checkoutEmail" placeholder="you@example.com" />
+      </div>
+      <button class="btn btn-primary" id="checkoutBtn" style="width:100%">Checkout</button>
+      <p class="muted small" id="checkoutNote"></p>
+    </div>
+  </aside>
+
+  <!-- Settlement checkout modal (bank transfer / MyCash / cash on delivery) -->
+  <div class="modal-backdrop" id="settleModal">
+    <div class="modal settle-modal">
+      <h3>Place your order</h3>
+      <p class="muted small">
+        Pay with a PNG payment method below — no card needed. Your order reference
+        identifies the payment; the vendor confirms it in their dashboard.
+      </p>
+      <div class="settle-ref-row">
+        <span class="muted small">Your reference</span>
+        <strong id="settleRef">TC-XXXXXX</strong>
+      </div>
+      <div class="form-group">
+        <label>Payment method</label>
+        <div class="method-list" id="methodList"></div>
+      </div>
+      <div class="pay-instructions" id="payInstructions"></div>
+      <div class="settle-total">
+        <span class="muted">Amount to pay</span>
+        <strong id="settleTotal">K0.00</strong>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="cancelSettleBtn">Cancel</button>
+        <button class="btn btn-primary" id="placeOrderBtn">Place order</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p>
+      <div>
+        <a href="designer.html">Designer</a>
+        <a href="shop.html">Shop</a>
+        <a href="spaces.html">Sell With Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="tc.js"></script>
+  <script src="shop.js"></script>
+</body>
+</html>

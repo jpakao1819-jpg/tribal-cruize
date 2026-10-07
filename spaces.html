@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sell With Us | Tribal Cruize</title>
+  <meta name="description" content="Purchase a space on Tribal Cruize and open your company's storefront." />
+
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="tc.css" />
+  <link rel="stylesheet" href="spaces.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home">
+        <img src="assets/logo.png" alt="Tribal Cruize logo" />
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="tribal-cruize.html">Home</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="spaces.html" class="active">Sell With Us</a></li>
+        <li><button class="button btn-sm" id="accountBtn">Account</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="spaces-hero">
+      <div class="container">
+        <p class="eyebrow">For companies</p>
+        <h1>Buy a space.<br />Open your storefront.</h1>
+        <p class="muted hero-sub">
+          A space gives your company a permanent storefront on Tribal Cruize — your
+          catalog, your branding, your payouts. Shoppers check out in-app and the
+          money lands directly in your account.
+        </p>
+        <div id="mySpace" class="my-space" hidden></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="success-banner" id="successBanner" hidden>
+          <strong>Space purchase complete.</strong>
+          Your storefront is live — head to your dashboard to stock it.
+          <a href="vendor.html" class="btn btn-sm btn-primary" style="margin-left:0.6rem">Open dashboard</a>
+        </div>
+
+        <div class="section-heading">
+          <p class="eyebrow">Pricing</p>
+          <h2>Pick your space</h2>
+          <p id="billingNote">Billed monthly. Cancel any time from your dashboard.</p>
+        </div>
+
+        <div class="grid grid-3" id="tierGrid"></div>
+
+        <div class="how row-steps">
+          <div><span>1</span> Create your account</div>
+          <div><span>2</span> Complete payout onboarding</div>
+          <div><span>3</span> Pay for your space</div>
+          <div><span>4</span> Stock your storefront</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth modal -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal">
+      <h3 id="authTitle">Sign in to continue</h3>
+      <div class="form-group">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" placeholder="you@company.com" />
+      </div>
+      <div class="form-group">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" placeholder="At least 6 characters" />
+      </div>
+      <p class="gen-error" id="authError" hidden></p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="switchAuthBtn">Create an account</button>
+        <button class="btn" id="cancelAuthBtn">Cancel</button>
+        <button class="btn btn-primary" id="submitAuthBtn">Sign in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settlement modal for buying a space -->
+  <div class="modal-backdrop" id="spaceSettleModal">
+    <div class="modal settle-modal">
+      <h3>Reserve your space</h3>
+      <p class="muted small">
+        Pay with a PNG payment method — no card needed. Once the payment is
+        confirmed your storefront goes live.
+      </p>
+      <div class="settle-ref-row">
+        <span class="muted small">Your reference</span>
+        <strong id="spaceRef">TC-XXXXXX</strong>
+      </div>
+      <div class="form-group">
+        <label>Payment method</label>
+        <div class="method-list" id="spaceMethodList"></div>
+      </div>
+      <div class="pay-instructions" id="spaceInstructions"></div>
+      <div class="settle-total">
+        <span class="muted">Amount to pay</span>
+        <strong id="spaceTotal">K0.00</strong>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="cancelSpaceSettleBtn">Cancel</button>
+        <button class="btn btn-primary" id="confirmSpaceBtn">Place order</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p>
+      <div>
+        <a href="designer.html">Designer</a>
+        <a href="shop.html">Shop</a>
+        <a href="spaces.html">Sell With Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="tc.js"></script>
+  <script src="spaces.js"></script>
+</body>
+</html>
