@@ -6,6 +6,14 @@
 // Called by spaces.html with the signed-in user's JWT. Creates (or reuses) a
 // Connect Express account for the vendor and returns the onboarding URL.
 
+declare const Deno: {
+  env: { get(key: string): string | undefined };
+  serve(handler: (req: Request) => Promise<Response> | Response): void;
+};
+
+// @ts-ignore
+import { createClient } from "@supabase/supabase-js";
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -29,7 +37,7 @@ function stripeForm(auth: string): { headers: HeadersInit; body: URLSearchParams
   };
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
@@ -40,10 +48,6 @@ Deno.serve(async (req) => {
     if (!stripeKey) return json({ error: "STRIPE_SECRET_KEY is not configured" }, 500);
     if (!token) return json({ error: "Sign in required" }, 401);
 
-    const { createClient } = await import(
-      // @ts-ignore
-      "https://esm.sh/@supabase/supabase-js@2"
-    );
     const sb = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,

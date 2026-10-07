@@ -8,6 +8,11 @@
 //
 // POST { prompt: string, w?: number, h?: number }  -> image/png|jpeg bytes
 
+declare const Deno: {
+  env: { get(key: string): string | undefined };
+  serve(handler: (req: Request) => Promise<Response> | Response): void;
+};
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -21,7 +26,7 @@ function errJson(message: string, status: number): Response {
   });
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return errJson("Method not allowed", 405);
 

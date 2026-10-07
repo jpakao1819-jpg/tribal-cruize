@@ -6,11 +6,14 @@
 // Point a Stripe webhook at:
 //   https://<project-ref>.functions.supabase.co/stripe-webhook
 // with event: checkout.session.completed
-//
-// Fulfilment:
-//   kind=product  -> insert one order row per item, then create a Stripe
-//                    Transfer per vendor storefront (multi-vendor carts).
-//   kind=space    -> activate the buyer's storefront, insert a space order row.
+
+declare const Deno: {
+  env: { get(key: string): string | undefined };
+  serve(handler: (req: Request) => Promise<Response> | Response): void;
+};
+
+// @ts-ignore
+import { createClient } from "@supabase/supabase-js";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -58,7 +61,9 @@ async function verifySignature(
   return expected === v1;
 }
 
-Deno.serve(async (req) => {
+type ProductDbRecord = { id: string; price: number | string; title: string; storefrontId: string };
+
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const secret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
@@ -87,8 +92,6 @@ Deno.serve(async (req) => {
     "Content-Type": "application/x-www-form-urlencoded",
   };
 
-  // @ts-ignore
-  const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
   const svc = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -111,12 +114,14 @@ Deno.serve(async (req) => {
         .from("products")
         .select('id, price, title, "storefrontId"')
         .in("id", items.map((i) => i.id));
-      const byId = new Map((prods ?? []).map((p) => [p.id, p]));
+      const byId = new Map<string, ProductDbRecord>(
+        ((prods ?? []) as ProductDbRecord[]).map((p) => [p.id, p]),
+      );
       const buyerEmail = (session.customer_details as Record<string, string> | undefined)?.email ?? "";
 
       const totalsByStore = new Map<string, number>();
       for (const it of items) {
-        const p = byId.get(it.id) as Record<string, unknown> | undefined;
+        const p = byId.get(it.id);
         if (!p) continue;
         const amount = Number(p.price) * it.qty;
         await svc.from("orders").insert({
@@ -138,8 +143,7 @@ Deno.serve(async (req) => {
       }
 
       // Pay each vendor with a Transfer from the platform balance.
-      for (const [storeId, amount] of totalsByStore) {
-        if (amount <= 0) continue;
+      for (const [storeId, amount] of totalsByStore.entries()) {
         const { data: store } = await svc
           .from("storefronts")
           .select("stripe_account_id")
@@ -162,21 +166,20 @@ Deno.serve(async (req) => {
 
     // ---------------------------------------------------------------- space
     if (meta.kind === "space") {
-      const userId = meta.userId;
       const tier = meta.tier ?? "basic";
+      const userId = meta.userId;
+      const buyerEmail =
+        (session.customer_details as Record<string, string> | undefined)?.email ?? "";
       const amount = Number(session.amount_total ?? 0);
-      const buyerEmail = (session.customer_details as Record<string, string> | undefined)?.email ?? "";
+
       if (userId) {
-        const { data: store } = await svc
+        const { data: existing } = await svc
           .from("storefronts")
           .select("id")
           .eq("owner", userId)
           .maybeSingle();
-        if (store) {
-          await svc
-            .from("storefronts")
-            .update({ status: "active", tier })
-            .eq("id", store.id);
+        if (existing) {
+          await svc.from("storefronts").update({ tier, status: "active" }).eq("id", existing.id);
         } else {
           await svc.from("storefronts").insert({
             owner: userId,
