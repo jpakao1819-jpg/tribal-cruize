@@ -31,33 +31,37 @@ Deno.serve(async (req) => {
 
     const width = Math.min(1536, Math.max(256, Number(w) || 1024));
     const height = Math.min(1536, Math.max(256, Number(h) || 1024));
-    const seed = Math.floor(Math.random() * 1e9);
-    const url =
-      "https://image.pollinations.ai/prompt/" +
-      encodeURIComponent(prompt.slice(0, 800)) +
-      `?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+    const cleanPrompt = encodeURIComponent(prompt.trim().slice(0, 800));
 
-    // Free tier is flaky — retry a couple of times with a fresh seed.
+    // Free tier can be flaky — retry up to 3 times with exponential backoff & fresh seeds.
     let lastStatus = 0;
-    for (let i = 0; i < 3; i++) {
-      if (i > 0) await new Promise((r) => setTimeout(r, 1000 * i));
-      const res = await fetch(url.replace(/seed=\d+/, "seed=" + Math.floor(Math.random() * 1e9)));
-      const ct = res.headers.get("content-type") || "";
-      if (res.ok && ct.startsWith("image/")) {
-        const buf = await res.arrayBuffer();
-        return new Response(buf, {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
+
+      const seed = Math.floor(Math.random() * 1e9);
+      const url = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+
+      const res = await fetch(url);
+      const contentType = res.headers.get("content-type") || "";
+
+      if (res.ok && contentType.startsWith("image/")) {
+        const imageBuffer = await res.arrayBuffer();
+        return new Response(imageBuffer, {
           status: 200,
           headers: {
             ...cors,
-            "Content-Type": ct,
-            "Cache-Control": "no-store",
+            "Content-Type": contentType,
+            "Cache-Control": "public, max-age=3600",
           },
         });
       }
       lastStatus = res.status;
     }
+
     return errJson(`Image service error (HTTP ${lastStatus})`, 502);
-  } catch (e) {
-    return errJson(e instanceof Error ? e.message : "Unexpected error", 500);
+  } catch (err) {
+    return errJson(err instanceof Error ? err.message : "Unexpected error", 500);
   }
 });
