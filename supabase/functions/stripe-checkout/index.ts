@@ -1,12 +1,15 @@
-// Tribal Cruize — Checkout session creation (Supabase Edge Function)
+// Tribal Cruize — Stripe Checkout Session Creation (Supabase Edge Function)
 //
 // Deploy:  supabase functions deploy stripe-checkout
 // Secrets: supabase secrets set STRIPE_SECRET_KEY=... SPACE_PRICES='{"basic":"price_...","featured":"price_...","premium":"price_..."}'
-//          (put one-time space prices in SPACE_PRICES_ONETIME with the same JSON shape)
+//          SPACE_PRICES_ONETIME='{"basic":"price_...","featured":"price_...","premium":"price_..."}'
 //
 // POST { type: "product", items: [{productId, qty}], email, origin }   (guest or signed in)
-// POST { type: "space", tierId, email, origin }                        (signed in required)
-// -> { url }  redirect the browser to Stripe-hosted checkout.
+// POST { type: "space", tierId, origin }                                (auth required)
+// -> { url } Redirects browser to Stripe-hosted Checkout
+
+// @ts-ignore
+import { createClient } from "@supabase/supabase-js";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -21,7 +24,15 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-type Item = { productId: string; qty: number };
+function parseJsonEnv(key: string): Record<string, string> {
+  try {
+    return JSON.parse(Deno.env.get(key) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+type CartItem = { productId: string; qty: number };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -36,35 +47,25 @@ Deno.serve(async (req) => {
     const { type, origin } = payload;
     if (!origin) return json({ error: "Missing origin" }, 400);
 
-    const { createClient } = await import(
-      // @ts-ignore
-      "https://esm.sh/@supabase/supabase-js@2"
-    );
-    // Service role: guests have no RLS read access to product prices.
+    // Service role client: bypasses RLS to verify active product prices
     const svc = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     const form = new URLSearchParams();
-    const headers = {
-      Authorization: `Bearer ${stripeKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    };
-
     let mode = "payment";
-    let userId = "";
 
-    // ------------------------------------------------------------- products
+    // ------------------------------------------------------------- 1. Products Checkout
     if (type === "product") {
-      const items: Item[] = Array.isArray(payload.items) ? payload.items : [];
+      const items: CartItem[] = Array.isArray(payload.items) ? payload.items : [];
       if (!items.length) return json({ error: "Cart is empty" }, 400);
       if (items.length > 30) return json({ error: "Too many cart items" }, 400);
-      for (const it of items) {
-        if (!it.productId || !Number.isInteger(it.qty) || it.qty < 1 || it.qty > 99) {
-          return json({ error: "Invalid cart item" }, 400);
-        }
-      }
+
+      const invalidItem = items.find(
+        (it) => !it.productId || !Number.isInteger(it.qty) || it.qty < 1 || it.qty > 99,
+      );
+      if (invalidItem) return json({ error: "Invalid cart item" }, 400);
 
       const ids = items.map((i) => i.productId);
       const { data: prods, error } = await svc
@@ -72,6 +73,7 @@ Deno.serve(async (req) => {
         .select('id, price, title, "storefrontId"')
         .in("id", ids)
         .eq("active", true);
+
       if (error) return json({ error: error.message }, 500);
 
       const byId = new Map((prods ?? []).map((p) => [p.id, p]));
@@ -80,30 +82,28 @@ Deno.serve(async (req) => {
       }
 
       items.forEach((it, i) => {
-        const p: Record<string, unknown> = byId.get(it.productId)!;
+        const prod = byId.get(it.productId)!;
         form.set(`line_items[${i}][quantity]`, String(it.qty));
         form.set(`line_items[${i}][price_data][currency]`, "usd");
-        form.set(`line_items[${i}][price_data][unit_amount]`, String(p.price));
+        form.set(`line_items[${i}][price_data][unit_amount]`, String(prod.price));
         form.set(
           `line_items[${i}][price_data][product_data][name]`,
-          String(p.title).slice(0, 180),
+          String(prod.title).slice(0, 180),
         );
       });
 
-      form.set(
-        "metadata[items]",
-        items.map((i) => `${i.productId}x${i.qty}`).join(","),
-      );
+      form.set("metadata[items]", items.map((i) => `${i.productId}x${i.qty}`).join(","));
       form.set("metadata[kind]", "product");
       if (payload.email) form.set("customer_email", String(payload.email).slice(0, 200));
       form.set("success_url", `${origin}/shop.html?checkout=success`);
       form.set("cancel_url", `${origin}/shop.html?cart=cancel`);
     }
 
-    // ---------------------------------------------------------------- space
+    // ------------------------------------------------------------- 2. Space Tier Checkout
     else if (type === "space") {
       const token = authHeader.replace(/^Bearer\s+/, "");
       if (!token) return json({ error: "Sign in required" }, 401);
+
       const sb = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -112,33 +112,28 @@ Deno.serve(async (req) => {
       const { data: userData } = await sb.auth.getUser(token);
       const user = userData?.user;
       if (!user) return json({ error: "Sign in required" }, 401);
-      userId = user.id;
 
       const tierId = String(payload.tierId ?? "");
       if (!tierId) return json({ error: "Missing tierId" }, 400);
 
-      let prices: Record<string, string> = {};
-      let oneTime: Record<string, string> = {};
-      try { prices = JSON.parse(Deno.env.get("SPACE_PRICES") ?? "{}"); } catch { /* empty */ }
-      try { oneTime = JSON.parse(Deno.env.get("SPACE_PRICES_ONETIME") ?? "{}"); } catch { /* empty */ }
+      const prices = parseJsonEnv("SPACE_PRICES");
+      const oneTime = parseJsonEnv("SPACE_PRICES_ONETIME");
 
       if (oneTime[tierId]) {
-        // One-time space purchase: an existing Stripe Price id (amount > 0).
         form.set("line_items[0][price]", oneTime[tierId]);
         form.set("line_items[0][quantity]", "1");
         mode = "payment";
       } else if (prices[tierId]) {
-        // Recurring space rental: a Stripe Subscription Price id.
         form.set("line_items[0][price]", prices[tierId]);
         form.set("line_items[0][quantity]", "1");
         mode = "subscription";
       } else {
-        return json({ error: `Space tier "${tierId}" has no price configured on the server` }, 400);
+        return json({ error: `Space tier "${tierId}" has no price configured on server` }, 400);
       }
 
       form.set("metadata[kind]", "space");
       form.set("metadata[tier]", tierId);
-      form.set("metadata[userId]", userId);
+      form.set("metadata[userId]", user.id);
       if (user.email) form.set("customer_email", user.email);
       form.set("success_url", `${origin}/spaces.html?checkout=success`);
       form.set("cancel_url", `${origin}/spaces.html`);
@@ -147,15 +142,21 @@ Deno.serve(async (req) => {
     }
 
     form.set("mode", mode);
-    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+
+    const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
-      headers,
+      headers: {
+        Authorization: `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
       body: form,
     });
-    const session = await res.json();
-    if (!res.ok) {
-      return json({ error: session?.error?.message ?? "Stripe error" }, 502);
+
+    const session = await stripeRes.json();
+    if (!stripeRes.ok) {
+      return json({ error: session?.error?.message ?? "Stripe checkout error" }, 502);
     }
+
     return json({ url: session.url });
   } catch (err) {
     return json({ error: err instanceof Error ? err.message : "Unexpected error" }, 500);
