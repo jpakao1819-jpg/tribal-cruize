@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tribal Cruize — Design Clothing. Sell Culture.</title>
+  <meta name="description" content="Design custom clothing with AI, shop independent brands, and sell your own on Tribal Cruize." />
+
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="tc.css" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container">
+      <a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home">
+        <img src="assets/logo.png" alt="Tribal Cruize logo" />
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="tribal-cruize.html" class="active">Home</a></li>
+        <li><a href="designer.html">Designer</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="spaces.html">Sell With Us</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <img
+            class="hero-logo"
+            src="assets/logo.png"
+            alt="Tribal Cruz — to land of the unexpected"
+          />
+          <h1>Design clothing.<br />Sell culture.</h1>
+          <p class="hero-sub">
+            Create original garments with AI, discover independent brands in the
+            marketplace, and open your own paid storefront to sell to the world.
+          </p>
+          <div class="hero-actions">
+            <a href="designer.html" class="btn btn-primary">Open the Design Studio</a>
+            <a href="shop.html" class="btn">Browse the Shop</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-card card-1">TEE · AI PRINT</div>
+          <div class="hero-card card-2">HOODIE · TRIBAL</div>
+          <div class="hero-card card-3">STOREFRONT · LIVE</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">What you can do</p>
+          <h2>One app, three moves</h2>
+        </div>
+        <div class="grid grid-3">
+          <article class="card feature">
+            <div class="feature-num">01</div>
+            <h3>Design with AI</h3>
+            <p class="muted">
+              Describe a graphic and watch it land on tees, hoodies, caps, bags and
+              full outfits. Recolor, reposition, and export a production-ready PNG.
+            </p>
+            <a class="btn btn-sm" href="designer.html">Start designing</a>
+          </article>
+          <article class="card feature">
+            <div class="feature-num">02</div>
+            <h3>Shop the marketplace</h3>
+            <p class="muted">
+              Browse storefronts from independent brands, add pieces to your cart and
+              check out securely — all inside the app.
+            </p>
+            <a class="btn btn-sm" href="shop.html">Enter the shop</a>
+          </article>
+          <article class="card feature">
+            <div class="feature-num">03</div>
+            <h3>Sell your brand</h3>
+            <p class="muted">
+              Purchase a space, build your storefront, upload your catalog and get
+              paid directly — payouts land in your own account.
+            </p>
+            <a class="btn btn-sm btn-primary" href="spaces.html">Get a space</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>From idea to checkout</h2>
+        </div>
+        <ol class="steps">
+          <li><strong>Design it.</strong> Generate a graphic in the studio and place it on any garment.</li>
+          <li><strong>Claim your space.</strong> Companies buy a storefront space and complete secure onboarding.</li>
+          <li><strong>Stock it.</strong> Add products with photos, prices and descriptions from your dashboard.</li>
+          <li><strong>Sell it.</strong> Shoppers check out in-app and the money is transferred straight to you.</li>
+        </ol>
+        <a href="spaces.html" class="btn btn-primary">Sell on Tribal Cruize</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p>
+      <div>
+        <a href="designer.html">Designer</a>
+        <a href="shop.html">Shop</a>
+        <a href="spaces.html">Sell With Us</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="tc.js"></script>
+</body>
+</html>
