@@ -8,6 +8,12 @@
 // POST { type: "space", tierId, origin }                                (auth required)
 // -> { url } Redirects browser to Stripe-hosted Checkout
 
+// Ambient Deno definition so editors without the Deno extension do not show red underlines
+declare const Deno: {
+  env: { get(key: string): string | undefined };
+  serve(handler: (req: Request) => Promise<Response> | Response): void;
+};
+
 // @ts-ignore
 import { createClient } from "@supabase/supabase-js";
 
@@ -33,8 +39,9 @@ function parseJsonEnv(key: string): Record<string, string> {
 }
 
 type CartItem = { productId: string; qty: number };
+type ProductRecord = { id: string; price: number | string; title: string; storefrontId?: string };
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
@@ -76,7 +83,8 @@ Deno.serve(async (req) => {
 
       if (error) return json({ error: error.message }, 500);
 
-      const byId = new Map((prods ?? []).map((p) => [p.id, p]));
+      const productsList = (prods ?? []) as ProductRecord[];
+      const byId = new Map<string, ProductRecord>(productsList.map((p) => [p.id, p]));
       if (byId.size !== new Set(ids).size) {
         return json({ error: "One or more products are no longer available" }, 400);
       }

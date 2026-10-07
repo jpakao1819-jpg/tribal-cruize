@@ -148,7 +148,7 @@ Deno.serve(async (req) => {
         if (!store?.stripe_account_id) continue;
         const body = new URLSearchParams();
         body.set("amount", String(amount));
-        body.set("currency", session.currency ?? "usd");
+        body.set("currency", String(session.currency ?? "usd"));
         body.set("destination", store.stripe_account_id);
         body.set("transfer_group", String(session.id));
         await fetch("https://api.stripe.com/v1/transfers", {
