@@ -23,6 +23,22 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // ---------------------------------------------------------------- small helpers
+  function fmtBytes(b) {
+    if (!b) return "—";
+    if (b < 1024) return b + " B";
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
+    return (b / (1024 * 1024)).toFixed(2) + " MB";
+  }
+  function slugifyLocal(s) {
+    return String(s == null ? "" : s)
+      .toLowerCase()
+      .replace(/[^\w\s-]+/g, "")
+      .replace(/[-\s]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60) || "garment";
+  }
+
   // ---------------------------------------------------------------- defaults
   const DEFAULT_CATEGORY = (CFG && CFG.clothingDefaults && CFG.clothingDefaults.categories) || [
     "Sportswear",
@@ -516,7 +532,9 @@
   }
 
   function canReconstruct() {
-    return photoWizardState.photos.some((p) => p.passed) && photoWizardState.photos.length >= 3;
+    const ps = photoWizardState || null;
+    if (!ps || !Array.isArray(ps.photos)) return false;
+    return ps.photos.some((p) => p.passed) && ps.photos.length >= 3;
   }
 
   // ---------------------------------------------------------------- reconstruction (integration point)
@@ -570,12 +588,168 @@
       const result = await reconstructFromPhotos(photoWizardState.photos);
       if (!result.ok) throw new Error("Reconstruction did not produce a usable garment");
       photoWizardState.reconstructed = result.artifact;
+      // Render a real 3D preview of the reconstructed heightfield into the
+      // review stage so the user can see the 3D garment before registering.
+      try {
+        await renderReconstructionPreview(photoWizardState.photos, result.artifact);
+      } catch (e) {
+        // 3D preview is a nice-to-have; the metadata review still works.
+        console.warn("Reconstruction 3D preview failed:", e.message || e);
+      }
       showStep(5);
       toast("3D garment reconstructed", "ok");
     } catch (err) {
       showStep(2);
       toast("Reconstruction failed — " + (err.message || ""), "err");
     }
+  }
+
+  // ---------------------------------------------------------------- 3D preview of reconstruction
+  let _threeCache = null;
+  async function getThree() {
+    if (_threeCache) return _threeCache;
+    const m = await import("three");
+    const addons = await Promise.all([
+      import("three/addons/controls/OrbitControls.js"),
+    ]);
+    _threeCache = { THREE: m.default, OrbitControls: addons[0].OrbitControls };
+    return _threeCache;
+  }
+
+  let _reconReview = null; // { scene, camera, renderer, controls, group, host }
+
+  async function renderReconstructionPreview(photos, artifact) {
+    const three = await getThree();
+    const T = three.THREE;
+    const front = photos.find((p) => p.requiredId === "front");
+    if (!front || !front.dataUrl) return null;
+
+    const { canvas: srcCanvas, ctx } = await (async function () {
+      const img = await loadImageFully(front.dataUrl);
+      const c = document.createElement("canvas");
+      const w = Math.min(512, Math.max(64, img.naturalWidth));
+      const h = Math.min(512, Math.max(64, img.naturalHeight));
+      c.width = w;
+      c.height = h;
+      const cx = c.getContext("2d", { willReadFrequently: true });
+      cx.drawImage(img, 0, 0, w, h);
+      return { canvas: c, ctx: cx };
+    })();
+
+    // Build luminance grid (reuse the pure math from image-to-stl.js).
+    const SIMPLE_CELLS = 96;
+    const big = Math.max(srcCanvas.width, srcCanvas.height);
+    const small = Math.min(srcCanvas.width, srcCanvas.height);
+    const cellsX = Math.max(2, Math.round((srcCanvas.width / big) * SIMPLE_CELLS));
+    const cellsY = Math.max(2, Math.round((srcCanvas.height / big) * SIMPLE_CELLS));
+    const d = ctx.getImageData(0, 0, cellsX, cellsY).data;
+    const lum = new Float32Array(cellsX * cellsY);
+    for (let i = 0; i < cellsX * cellsY; i++) {
+      const p = i * 4;
+      lum[i] = (0.299 * d[p] + 0.587 * d[p + 1] + 0.114 * d[p + 2]) / 255;
+    }
+
+    const geoData = (window.__tcImageToStl && window.__tcImageToStl.buildHeightfieldGeometry)
+      ? window.__tcImageToStl.buildHeightfieldGeometry(lum, cellsX, cellsY, { mmPerUnitMin: 120, reliefDepthRatio: 0.12, basePlateRatio: 0.02 })
+      : null;
+    if (!geoData) return null;
+
+    const { verts, tris, wMM, hMM, depthMM, plateMM, cellsX: gx, cellsY: gy } = geoData;
+
+    // Build a fresh scene into the review canvas.
+    const host = document.getElementById("reviewCanvas");
+    if (!host) return null;
+    host.innerHTML = "";
+
+    const renderer = new T.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.setSize(host.clientWidth || 480, host.clientHeight || 420, false);
+    host.appendChild(renderer.domElement);
+
+    const scene = new T.Scene();
+    scene.add(new T.HemisphereLight(0xffffff, 0x3a3a3a, 1.15));
+    const key = new T.DirectionalLight(0xffffff, 1.35);
+    key.position.set(2.4, 4.2, 3.2);
+    scene.add(key);
+    const rim = new T.DirectionalLight(0xffffff, 0.5);
+    rim.position.set(-2, 2.4, -3);
+    scene.add(rim);
+    const grid = new T.GridHelper(Math.max(wMM, hMM) * 1.4, 20, 0x4a453d, 0x2b2723);
+    if (grid.material) grid.material.transparent = true, grid.material.opacity = 0.5;
+    grid.position.y = 0;
+    scene.add(grid);
+
+    // Heightfield mesh (matte light-gray, like the mannequin palette).
+    const positions = new Float32Array(verts.length * 3);
+    for (let i = 0; i < verts.length; i++) {
+      positions[i * 3] = verts[i].x;
+      positions[i * 3 + 1] = verts[i].y;
+      positions[i * 3 + 2] = verts[i].z;
+    }
+    const indices = new Uint16Array(tris.length * 3);
+    for (let i = 0; i < tris.length; i++) {
+      indices[i * 3] = tris[i].a;
+      indices[i * 3 + 1] = tris[i].b;
+      indices[i * 3 + 2] = tris[i].c;
+    }
+    const geom = new T.BufferGeometry();
+    geom.setAttribute("position", new T.BufferAttribute(positions, 3));
+    geom.setIndex(new T.BufferAttribute(indices, 1));
+    geom.computeVertexNormals();
+    const mat = new T.MeshStandardMaterial({
+      color: 0xd7d7d7,
+      roughness: 0.92,
+      metalness: 0,
+      flatShading: false,
+    });
+    const mesh = new T.Mesh(geom, mat);
+    mesh.position.y = 0;
+    scene.add(mesh);
+
+    // Camera.
+    const camera = new T.PerspectiveCamera(38, host.clientWidth / host.clientHeight || 1, 0.1, 40);
+    const cx = wMM / 2,
+      cy = hMM / 2 + plateMM + depthMM * 0.25;
+    camera.position.set(cx + 1.6, cy + 1.2, cx + 2.6);
+    camera.lookAt(cx, cy, 0);
+
+    const controls = new three.OrbitControls(camera, renderer.domElement);
+    controls.target.set(cx, cy, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.minDistance = 0.6;
+    controls.maxDistance = 12;
+    controls.maxPolarAngle = Math.PI * 0.92;
+
+    _reconReview = { scene, camera, renderer, controls, host, group: mesh };
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      const stage = document.getElementById("reviewStage");
+      if (stage && stage.hidden) return;
+      if (_reconReview && _reconReview.controls) _reconReview.controls.update();
+      if (_reconReview && _reconReview.renderer && _reconReview.scene && _reconReview.camera)
+        _reconReview.renderer.render(_reconReview.scene, _reconReview.camera);
+    })();
+
+    // Size to stage.
+    const stage = document.getElementById("reviewStage");
+    if (stage && !stage.hidden) {
+      renderer.setSize(stage.clientWidth || 480, stage.clientHeight || 420, false);
+      camera.aspect = (stage.clientWidth || 480) / (stage.clientHeight || 420);
+      camera.updateProjectionMatrix();
+    }
+
+    return _reconReview;
+  }
+
+  async function loadImageFully(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not decode image"));
+      img.src = dataUrl;
+    });
   }
 
   // ---------------------------------------------------------------- registration
@@ -697,6 +871,12 @@
     set("confirmModelM", "Ready");
     set("confirmRegionsM", String(regions || 0));
     set("confirmFabricM", g.fabric || "Custom / unknown");
+    const stl = (g.garment_3d && g.garment_3d.stl) || null;
+    const stlText = stl && stl.dataUrl
+      ? `${stl.tris.toLocaleString()} tris · ${fmtBytes(stl.bytes)} · ${stl.wMM.toFixed(1)}×${stl.hMM.toFixed(1)} mm`
+      : "—";
+    set("confirmStl", stlText);
+    set("confirmStlM", stlText);
     $("confirmSection").hidden = true;
     $("confirmModal").classList.add("open");
   }
@@ -1093,6 +1273,77 @@
       }
       openRegister(pending.artifact, pending.sourcePhotos);
     });
+
+    // ---- Image → STL (review stage): convert the front photo to a binary STL ----
+    const stlBtn = $("reviewStlBtn");
+    const stlStatus = $("reviewStlStatus");
+    const stlDownloadRow = $("reviewStlDownloadRow");
+    const stlDownload = $("reviewStlDownload");
+    const stlRetry = $("reviewStlRetry");
+    let stlResult = null;
+    if (stlBtn && window.__tcImageToStl) {
+      stlBtn.addEventListener("click", async () => {
+        const pending = (photoWizardState && photoWizardState.pendingRegistration) || null;
+        if (!pending) {
+          toast("Generate a 3D garment first, then convert its photo to STL", "err");
+          return;
+        }
+        const artifact = pending.artifact || {};
+        const source =
+          (pending.sourcePhotos && pending.sourcePhotos.length
+            ? pending.sourcePhotos.find((p) => p.requiredId === "front").dataUrl
+            : null);
+        if (!source) {
+          toast("No front photo to convert — add the front photo first", "err");
+          return;
+        }
+        stlBtn.disabled = true;
+        stlBtn.textContent = "Building STL…";
+        stlStatus.hidden = true;
+        stlDownloadRow.hidden = true;
+        try {
+          const result = await window.__tcImageToStl.buildStlAsync(source, {
+            cells: 192,
+            reliefDepthRatio: 0.12,
+            basePlateRatio: 0.02,
+            mmPerUnitMin: 200,
+          });
+          stlResult = result;
+          window.__tcImageToStl.attachStlToArtifact(pending.artifact, result);
+          stlStatus.hidden = false;
+          stlStatus.innerHTML =
+            `STL ready · ${result.tris.toLocaleString()} triangles · ${fmtBytes(result.stlBytes)} · ` +
+            `${result.wMM.toFixed(1)}×${result.hMM.toFixed(1)} mm · depth ${result.depthMM.toFixed(1)} mm`;
+          if (stlDownload) {
+            stlDownload.dataset.stl = result.stlDataUrl;
+            stlDownload.dataset.name = ($("regName").value || "garment").trim() || "garment";
+            stlDownload.disabled = false;
+          }
+          stlDownloadRow.hidden = false;
+          toast("STL generated from the front photo", "ok");
+        } catch (e) {
+          toast("STL generation failed — " + (e.message || ""), "err");
+        } finally {
+          stlBtn.disabled = false;
+          stlBtn.textContent = "Image → STL";
+        }
+      });
+      if (stlDownload) {
+        stlDownload.addEventListener("click", () => {
+          const url = stlDownload.dataset.stl;
+          const name = stlDownload.dataset.name || "garment";
+          if (url) window.__tcImageToStl.downloadStlFromDataUrl(url, slugifyLocal(name) + ".stl");
+        });
+      }
+      if (stlRetry) {
+        stlRetry.addEventListener("click", () => {
+          stlStatus.hidden = true;
+          stlDownloadRow.hidden = true;
+          stlResult = null;
+          if (stlDownload) stlDownload.disabled = true;
+        });
+      }
+    }
   }
 
   // ---------------------------------------------------------------- edit garment (metadata + 3D)

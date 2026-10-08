@@ -125,9 +125,15 @@
         <h3>Review reconstruction</h3>
         <p class="muted small">Inspect the 3D garment. If it looks right, register it — otherwise re-import or re-capture.</p>
         <div class="props-actions">
+          <button class="btn btn-primary" id="reviewStlBtn">Image → STL</button>
           <button class="btn btn-primary" id="reviewRegisterBtn">Register This Clothing</button>
           <button class="btn" id="reviewBackBtn">Back to library</button>
           <button class="btn btn-ghost" id="reviewRetryBtn">Re-import photos</button>
+        </div>
+        <div class="stl-result" id="reviewStlStatus" hidden></div>
+        <div class="props-actions" id="reviewStlDownloadRow" hidden>
+          <button class="btn btn-sm" id="reviewStlDownload" data-name="garment">Download STL</button>
+          <button class="btn btn-ghost btn-sm" id="reviewStlRetry">Clear</button>
         </div>
         <p class="review-meta" id="reviewMeta"></p>
       </section>
@@ -176,8 +182,9 @@
             <div><strong>3D Model</strong><span class="ok" id="confirmModel">Ready</span></div>
             <div><strong>Editable regions</strong><span id="confirmRegions"></span></div>
             <div><strong>Fabric</strong><span id="confirmFabric"></span></div>
+            <div><strong>STL model</strong><span id="confirmStl">—</span></div>
           </div>
-          <div class="props-actions" style="margin-top:1.2rem">
+          <div class="props-actions confirm-actions" style="margin-top:1.2rem">
             <button class="btn btn-primary" id="confirmDesignBtn">Start Designing</button>
             <button class="btn" id="confirmViewBtn">View 3D Model</button>
             <button class="btn btn-ghost" id="confirmLibraryBtn">Back to Clothing Library</button>
@@ -200,7 +207,7 @@
           <button class="chip" data-style="Skull">Skull</button>
         </div>
         <div class="props-actions">
-          <button class="btn btn-primary" id="generateBtn">✨ Generate design</button>
+          <button class="btn btn-primary" id="generateBtn">Generate design</button>
           <button class="btn" id="uploadBtn">Upload image</button>
           <input type="file" id="uploadInput" accept="image/*" hidden />
         </div>
@@ -254,7 +261,7 @@
         </div>
         <div class="props-actions">
           <button class="btn" id="saveBtn">Save design</button>
-          <button class="btn btn-primary" id="exportBtn">⬇ Download PNG</button>
+          <button class="btn btn-primary" id="exportBtn">Download PNG</button>
         </div>
         <div class="divider"></div>
         <h4 class="small-label">Saved designs</h4>
@@ -311,15 +318,12 @@
       <p class="muted small" style="margin:0 0 1rem">Build your library from photos, an existing 3D model, or the app's own garment tools.</p>
       <div class="add-options">
         <button class="add-option" data-mode="photos">
-          <span class="add-opt-icon">📷</span>
           <div><strong>Create From Photos</strong><span class="add-opt-sub">Capture or upload photos → validate → reconstruct → register</span></div>
         </button>
         <button class="add-option" data-mode="import">
-          <span class="add-opt-icon">⬇</span>
           <div><strong>Import 3D Model</strong><span class="add-opt-sub">Import a supported garment model (.glb / .obj / .gltf)</span></div>
         </button>
         <button class="add-option" data-mode="custom">
-          <span class="add-opt-icon">✎</span>
           <div><strong>Create Custom Garment</strong><span class="add-opt-sub">Build a garment with the app's 3D garment tools</span></div>
         </button>
       </div>
@@ -353,8 +357,8 @@
             <p class="muted small" id="photosStepLabel" style="margin:0.2rem 0 0">Capture or upload each required photo.</p>
           </div>
           <div class="props-actions">
-            <button class="btn" id="photoCaptureBtn">📷 Capture</button>
-            <button class="btn" id="photoUploadBtn">⬆ Upload</button>
+            <button class="btn" id="photoCaptureBtn">Capture</button>
+            <button class="btn" id="photoUploadBtn">Upload</button>
             <input type="file" id="photoFilesInput" accept="image/*" multiple hidden />
           </div>
         </div>
@@ -409,8 +413,9 @@
           <div><strong>3D Model</strong><span class="ok" id="confirmModelM">Ready</span></div>
           <div><strong>Editable regions</strong><span id="confirmRegionsM"></span></div>
           <div><strong>Fabric</strong><span id="confirmFabricM"></span></div>
+          <div><strong>STL model</strong><span id="confirmStlM">—</span></div>
         </div>
-        <div class="props-actions" style="margin-top:1.2rem">
+        <div class="props-actions confirm-actions" style="margin-top:1.2rem">
           <button class="btn btn-primary" id="confirmDesignBtnM">Start Designing</button>
           <button class="btn" id="confirmViewBtnM">View 3D Model</button>
           <button class="btn btn-ghost" id="confirmLibraryBtnM">Back to Clothing Library</button>
@@ -544,6 +549,7 @@
     }
   </script>
   <script type="module" src="mannequin.js"></script>
-  <script type="module" src="clothing-library.js"></script>
+  <script type="module" src="image-to-stl.js?v=2"></script>
+  <script type="module" src="clothing-library.js?v=2"></script>
 </body>
 </html>

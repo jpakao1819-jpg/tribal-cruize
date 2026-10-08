@@ -288,6 +288,8 @@ body.mode-3d #clearArtBtn { display: none; }
 
 /* review stage metadata */
 .review-meta { font-size: 0.82rem; color: var(--muted); margin-top: 0.8rem; }
+.stl-result { font-size: 0.82rem; color: var(--ok); background: rgba(125,216,125,0.1); border: 1px solid rgba(125,216,125,0.35); border-radius: 8px; padding: 0.5rem 0.7rem; margin-top: 0.6rem; word-break: break-all; }
+.stl-result.err { color: var(--err); background: rgba(255,123,107,0.1); border-color: rgba(255,123,107,0.35); }
 .review-hint {
   position: absolute;
   left: 50%;
