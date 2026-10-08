@@ -97,4 +97,45 @@ window.TC_CONFIG = {
 
   // Bump this to invalidate old saved carts/designs after a schema change.
   storageVersion: 1,
+
+  // --- Clothing library (non-opinionated: defaults the user can change) -----
+  // These are hints, not rules — the person registering a garment picks its own
+  // name, category, fabric and tags. These lists only populate the form dropdowns
+  // so registration is faster.
+  clothingDefaults: {
+    categories: [
+      "Sportswear",
+      "Streetwear",
+      "Formal / Workwear",
+      "School Uniform",
+      "Traditional / Cultural",
+      "Activewear",
+      "Casual",
+      "Custom",
+    ],
+    fabrics: [
+      "Polyester",
+      "Cotton",
+      "Cotton blend",
+      "Jersey",
+      "Denim",
+      "Wool",
+      "Tech / performance",
+      "Satin",
+      "Custom / unknown",
+    ],
+    tagHints: [
+      "Short Sleeve",
+      "Long Sleeve",
+      "V-neck",
+      "Crew neck",
+      "Hoodie",
+      "Polo",
+      "Jersey",
+      "Pants",
+      "Shorts",
+      "Cap",
+      "Tote",
+    ],
+  },
 };

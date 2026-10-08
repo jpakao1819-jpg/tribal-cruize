@@ -270,6 +270,181 @@
     return { url: data.publicUrl, error: null };
   }
 
+  // --------------------------------------------------------- clothing library
+  // Registered garments and the designs created from them. The 3D artifact
+  // is stored as a JSON document so geometry, sections, UV, materials and
+  // editable-region metadata survive registration.
+  const clothingDemo = {
+    list() {
+      return lsGet("clothing", []);
+    },
+    save(rows) {
+      lsSet("clothing", rows);
+    },
+    find(id) {
+      return this.list().find((r) => r.id === id) || null;
+    },
+    add(row) {
+      const rows = this.list();
+      const full = Object.assign({ id: uid(), created_at: new Date().toISOString() }, row);
+      rows.push(full);
+      this.save(rows);
+      return full;
+    },
+    update(id, patch) {
+      const rows = this.list();
+      let changed = null;
+      rows.forEach((r) => {
+        if (r.id === id) { Object.assign(r, patch); changed = r; }
+      });
+      this.save(rows);
+      return changed;
+    },
+    remove(id) {
+      const rows = this.list().filter((r) => r.id !== id);
+      this.save(rows);
+      return rows;
+    },
+  };
+
+  const designsDemo = {
+    list() {
+      return lsGet("designs", []);
+    },
+    save(rows) {
+      lsSet("designs", rows);
+    },
+    add(row) {
+      const rows = this.list();
+      const full = Object.assign({ id: uid(), created_at: new Date().toISOString() }, row);
+      rows.push(full);
+      this.save(rows);
+      return full;
+    },
+    byGarment(garmentId) {
+      return this.list().filter((d) => d.garment_id === garmentId);
+    },
+    remove(id) {
+      const rows = this.list().filter((r) => r.id !== id);
+      this.save(rows);
+      return rows;
+    },
+  };
+
+  function slug(s) {
+    return String(s == null ? "" : s)
+      .toLowerCase()
+      .replace(/[^\w\s-]+/g, "")
+      .replace(/[-\s]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60);
+  }
+
+  function parseTags(raw) {
+    return raw
+      .split(/[,\n]/)
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+  }
+
+  function joinTags(tags) {
+    return Array.isArray(tags) ? tags.join(", ") : "";
+  }
+
+  // ---------------------------------------------------------------- clothing api
+  const clothing = {
+    demo: !sb,
+
+    async list(opts) {
+      opts = opts || {};
+      if (!sb) {
+        let rows = clothingDemo.list();
+        if (opts.status) rows = rows.filter((r) => r.status === opts.status);
+        if (opts.eq) rows = rows.filter((r) =>
+          Object.keys(opts.eq).every((k) => r[k] === opts.eq[k])
+        );
+        if (opts.order) {
+          rows = rows.slice().sort((a, b) => {
+            const av = a[opts.order], bv = b[opts.order];
+            if (av === bv) return 0;
+            return (av > bv ? 1 : -1) * (opts.desc ? -1 : 1);
+          });
+        }
+        return { data: rows, error: null };
+      }
+      let q = sb.from("clothing").select(opts.select || "*");
+      if (opts.eq) Object.keys(opts.eq).forEach((k) => (q = q.eq(k, opts.eq[k])));
+      if (opts.order) q = q.order(opts.order, { ascending: !opts.desc });
+      if (opts.limit) q = q.limit(opts.limit);
+      const { data, error } = await q;
+      return { data: data || [], error };
+    },
+
+    async get(id) {
+      if (!sb) return { data: clothingDemo.find(id), error: null };
+      const { data, error } = await sb.from("clothing").select("*").eq("id", id).single();
+      return { data, error };
+    },
+
+    async create(row) {
+      if (!sb) return { data: clothingDemo.add(row), error: null };
+      const { data, error } = await sb.from("clothing").insert(row).select().single();
+      return { data, error };
+    },
+
+    async update(id, patch) {
+      if (!sb) return { data: clothingDemo.update(id, patch), error: null };
+      const { data, error } = await sb.from("clothing").update(patch).eq("id", id).select().single();
+      return { data, error };
+    },
+
+    async remove(id) {
+      if (!sb) return { error: clothingDemo.remove(id) ? null : { message: "not found" } };
+      const { error } = await sb.from("clothing").delete().eq("id", id);
+      return { error };
+    },
+  };
+
+  const designs = {
+    demo: !sb,
+
+    async list(opts) {
+      opts = opts || {};
+      if (!sb) {
+        let rows = designsDemo.list();
+        if (opts.garment_id) rows = rows.filter((d) => d.garment_id === opts.garment_id);
+        if (opts.eq) rows = rows.filter((r) =>
+          Object.keys(opts.eq).every((k) => r[k] === opts.eq[k])
+        );
+        if (opts.order) {
+          rows = rows.slice().sort((a, b) => {
+            const av = a[opts.order], bv = b[opts.order];
+            if (av === bv) return 0;
+            return (av > bv ? 1 : -1) * (opts.desc ? -1 : 1);
+          });
+        }
+        return { data: rows, error: null };
+      }
+      let q = sb.from("designs").select(opts.select || "*");
+      if (opts.eq) Object.keys(opts.eq).forEach((k) => (q = q.eq(k, opts.eq[k])));
+      if (opts.order) q = q.order(opts.order, { ascending: !opts.desc });
+      const { data, error } = await q;
+      return { data: data || [], error };
+    },
+
+    async create(row) {
+      if (!sb) return { data: designsDemo.add(row), error: null };
+      const { data, error } = await sb.from("designs").insert(row).select().single();
+      return { data, error };
+    },
+
+    async remove(id) {
+      if (!sb) return { error: designsDemo.remove(id) ? null : { message: "not found" } };
+      const { error } = await sb.from("designs").delete().eq("id", id);
+      return { error };
+    },
+  };
+
   // --------------------------------------------------------- page chrome
   function chrome() {
     // Mobile nav
@@ -333,5 +508,10 @@
     lsGet,
     lsSet,
     uid,
+    slug,
+    parseTags,
+    joinTags,
+    clothing,
+    designs,
   };
 })();

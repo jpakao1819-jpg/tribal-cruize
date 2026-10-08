@@ -37,6 +37,15 @@ are **not used by the app** — they are kept as an optional path if you ever
 operate from a Stripe-supported country or a PNG card gateway (Kina Bank IPG /
 BSP e-commerce) is added later.
 
+The `clothing` and `designs` tables (also created by the SQL script) back the
+**registered clothing library** in the designer: a reconstructed garment only
+becomes a reusable template after someone explicitly registers it with their own
+name, category, fabric and tags. The 3D artifact is stored as JSON in
+`clothing.garment_3d` so geometry, sections, front/back surfaces, sleeves,
+collar, cuffs, hems, UV mapping and editable-region metadata are preserved.
+Space activation is a manual status flip in the table editor until an admin page
+exists.
+
 ## 3. How orders are settled
 
 | Step | Who | Where |
@@ -66,3 +75,5 @@ you charge — keep them in sync with what you expect to receive.
 | `storefronts` | vendor (dashboard), you (activation) | everyone (active only), owner (own) |
 | `products` | vendor (dashboard) | everyone (listed), owner (all) |
 | `orders` | shoppers (`pending_payment` only), vendor (mark paid) | vendor (own storefront) |
+| `clothing` | designer (registration) | owner (own garments), designs list |
+| `designs` | designer (create from a garment) | owner (own designs) |

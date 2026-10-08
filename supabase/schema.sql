@@ -159,3 +159,73 @@ create policy "product images authed update" on storage.objects
 drop policy if exists "product images authed delete" on storage.objects;
 create policy "product images authed delete" on storage.objects
   for delete to authenticated using (bucket_id = 'product-images');
+
+-- ===================================================== clothing library ===========
+-- Registered garments (reusable 3D clothing templates) and the designs
+-- created from them. The 3D artifact is stored as a JSON document so
+-- geometry, sections, front/back surfaces, sleeves, collar, cuffs, hems,
+-- UV mapping and editable-region metadata all survive registration.
+create table if not exists public.clothing (
+  id uuid primary key default gen_random_uuid(),
+  name text not null default '',
+  description text default '',
+  category text default '',
+  fabric text default '',
+  tags text default '',                        -- comma-separated
+  status text not null default 'registered',   -- draft | registered | archived
+  thumbnail text default '',
+  garment_3d jsonb default '{}'::jsonb,        -- the editable 3D garment
+  created_by uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists clothing_created_by_idx on public.clothing (created_by);
+create index if not exists clothing_status_idx on public.clothing (status);
+
+create table if not exists public.designs (
+  id uuid primary key default gen_random_uuid(),
+  "garmentId" uuid not null references public.clothing (id) on delete cascade,
+  name text not null default '',
+  description text default '',
+  fabric_override text default '',
+  colors jsonb default '{}'::jsonb,            -- section -> color overrides
+  applied_art jsonb default '{}'::jsonb,       -- artwork + placement on the garment
+  status text not null default 'open',         -- open | done
+  created_by uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists designs_garment_idx on public.designs ("garmentId");
+
+alter table public.clothing enable row level security;
+alter table public.designs enable row level security;
+
+drop policy if exists "clothing read own" on public.clothing;
+create policy "clothing read own" on public.clothing
+  for select using (created_by = auth.uid());
+
+drop policy if exists "clothing insert own" on public.clothing;
+create policy "clothing insert own" on public.clothing
+  for insert with check (created_by = auth.uid());
+
+drop policy if exists "clothing update own" on public.clothing;
+create policy "clothing update own" on public.clothing
+  for update using (created_by = auth.uid());
+
+drop policy if exists "clothing delete own" on public.clothing;
+create policy "clothing delete own" on public.clothing
+  for delete using (created_by = auth.uid());
+
+drop policy if exists "designs read own" on public.designs;
+create policy "designs read own" on public.designs
+  for select using (created_by = auth.uid());
+
+drop policy if exists "designs insert own" on public.designs;
+create policy "designs insert own" on public.designs
+  for insert with check (created_by = auth.uid());
+
+drop policy if exists "designs delete own" on public.designs;
+create policy "designs delete own" on public.designs
+  for delete using (created_by = auth.uid());
+
+-- End clothing library block.
