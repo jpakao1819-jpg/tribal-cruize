@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tribal Cruize — Design Clothing. Sell Culture.</title>
-  <meta name="description" content="Design custom clothing with AI, shop independent brands, and sell your own on Tribal Cruize." />
+  <title>Tribal Cruize — Papua New Guinea's Digital Market Village</title>
+  <meta name="description" content="Discover Papua New Guinea's local makers, fashion, crafts and independent businesses in the Tribal Cruize digital market village." />
 
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="tc.css" />
   <link rel="stylesheet" href="landing.css" />
 </head>
 <body>
   <header class="site-header">
-    <nav class="navbar container">
+    <nav class="navbar container" aria-label="Main navigation">
       <a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home">
         <img src="assets/logo.png" alt="Tribal Cruize logo" />
       </a>
@@ -24,7 +23,7 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="tribal-cruize.html" class="active">Home</a></li>
         <li><a href="designer.html">Designer</a></li>
-        <li><a href="shop.html">Shop</a></li>
+        <li><a href="shop.html">Market</a></li>
         <li><a href="spaces.html">Sell With Us</a></li>
       </ul>
     </nav>
@@ -34,195 +33,86 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-text">
-          <img
-            class="hero-logo"
-            src="assets/logo.png"
-            alt="Tribal Cruize — a modern market village for Papua New Guinea"
-          />
-          <p class="eyebrow">Papua New Guinea market village</p>
-          <h1>Design clothing.<br />Sell culture.</h1>
+          <p class="eyebrow">Papua New Guinea · Made by our people</p>
+          <h1>Your market.<br /><span>Your stories.</span></h1>
           <p class="hero-sub">
-            Tribal Cruize is a digital market village where creators, brands,
-            makers and shoppers discover local culture through custom fashion,
-            handcrafted goods and modern digital commerce.
+            Meet the makers, explore local stalls and find pieces with a story.
+            Tribal Cruize brings Papua New Guinea's market culture together in one
+            welcoming place to discover, create and shop.
           </p>
+          <form class="hero-search" action="shop.html" method="get" role="search">
+            <label class="visually-hidden" for="marketSearch">Search the market</label>
+            <input id="marketSearch" name="q" type="search" placeholder="What are you looking for?" />
+            <button class="btn btn-primary" type="submit">Explore market <span aria-hidden="true">→</span></button>
+          </form>
           <div class="hero-actions">
-            <a href="designer.html" class="btn btn-primary">Open the Design Studio</a>
-            <a href="shop.html" class="btn">Browse the Shop</a>
-          </div>
-          <div class="hero-metrics">
-            <div><strong>150+</strong><span>local brands</span></div>
-            <div><strong>3D</strong><span>designer studio</span></div>
-            <div><strong>PNG</strong><span>first marketplace</span></div>
+            <a href="shop.html" class="text-link">Browse all stalls <span aria-hidden="true">↗</span></a>
+            <a href="spaces.html" class="text-link">Open your own stall <span aria-hidden="true">↗</span></a>
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="hero-card card-1">TEE · AI PRINT</div>
-          <div class="hero-card card-2">HOODIE · TRIBAL</div>
-          <div class="hero-card card-3">STOREFRONT · LIVE</div>
-          <div class="hero-panel card">
-            <p class="eyebrow small">This week in the market</p>
-            <h3>Featured community stalls</h3>
-            <ul>
-              <li>Mumu Streetwear</li>
-              <li>Hanuabada Goods</li>
-              <li>Koki Customs</li>
-            </ul>
-          </div>
+        <div class="hero-art" aria-label="Explore the Tribal Cruize market">
+          <div class="market-stamp"><span>PNG</span><small>made with<br />local pride</small></div>
+          <div class="market-art-card art-card-main"><span class="art-kicker">The market is yours</span><strong>Find your<br />next favourite.</strong><span class="art-mark" aria-hidden="true">TC</span></div>
+          <div class="market-art-card art-card-note"><span aria-hidden="true">✳</span> Local makers<br />are right here</div>
+          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        </div>
+      </div>
+      <div class="hero-bottom container"><span>Discover local</span><span class="hero-bottom-line"></span><span>Shop with purpose</span><span class="hero-bottom-line"></span><span>Keep culture moving</span></div>
+    </section>
+
+    <section class="section categories-section" aria-labelledby="categoriesTitle">
+      <div class="container">
+        <div class="section-heading heading-row">
+          <div><p class="eyebrow">A little bit of everything</p><h2 id="categoriesTitle">Find your corner<br />of the market.</h2></div>
+          <a class="text-link" href="shop.html">Explore all categories <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="category-grid">
+          <a class="category-tile category-fashion" href="shop.html?category=Fashion"><span class="category-symbol">✳</span><span>Fashion &amp; clothing</span><span class="category-arrow">↗</span></a>
+          <a class="category-tile category-craft" href="shop.html?category=Arts%20%26%20Crafts"><span class="category-symbol">◇</span><span>Arts &amp; crafts</span><span class="category-arrow">↗</span></a>
+          <a class="category-tile category-food" href="shop.html?category=Food"><span class="category-symbol">◉</span><span>Food &amp; produce</span><span class="category-arrow">↗</span></a>
+          <a class="category-tile category-home" href="shop.html?category=Home"><span class="category-symbol">⌂</span><span>Home &amp; living</span><span class="category-arrow">↗</span></a>
+          <a class="category-tile category-beauty" href="shop.html?category=Beauty"><span class="category-symbol">✦</span><span>Beauty &amp; care</span><span class="category-arrow">↗</span></a>
+          <a class="category-tile category-more" href="shop.html"><span class="category-symbol">＋</span><span>So much more</span><span class="category-arrow">↗</span></a>
         </div>
       </div>
     </section>
 
-    <section class="section section-alt">
+    <section class="section section-alt" aria-labelledby="stallsTitle">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Market vibes</p>
-          <h2>PNG culture meets modern online retail</h2>
+        <div class="section-heading heading-row">
+          <div><p class="eyebrow">Good people, good things</p><h2 id="stallsTitle">Meet the market.</h2><p>Explore independent stalls from local creators and businesses.</p></div>
+          <a class="text-link" href="shop.html">See all stalls <span aria-hidden="true">↗</span></a>
         </div>
-
-        <div class="market-categories">
-          <span class="chip">Clothing &amp; Fashion</span>
-          <span class="chip">Traditional PNG Products</span>
-          <span class="chip">Arts &amp; Crafts</span>
-          <span class="chip">Handmade Goods</span>
-          <span class="chip">Food &amp; Agriculture</span>
-          <span class="chip">Beauty &amp; Care</span>
-          <span class="chip">Home &amp; Living</span>
-          <span class="chip">Accessories</span>
-        </div>
-
-        <div class="vendor-strip">
-          <article class="market-card card">
-            <div class="mini-badge">Featured stall</div>
-            <h3>Mumu Streetwear</h3>
-            <p>Bold local prints, premium basics and Port Moresby energy.</p>
-            <a href="shop.html" class="text-link">Visit storefront</a>
-          </article>
-          <article class="market-card card">
-            <div class="mini-badge">Local maker</div>
-            <h3>Hanuabada Goods</h3>
-            <p>Traditional patterns translated into everyday wearable design.</p>
-            <a href="shop.html" class="text-link">Shop collection</a>
-          </article>
-          <article class="market-card card">
-            <div class="mini-badge">Design lane</div>
-            <h3>Koki Customs</h3>
-            <p>Caps, totes and custom apparel built for daily life and events.</p>
-            <a href="shop.html" class="text-link">See products</a>
-          </article>
-        </div>
+        <div class="vendor-strip" id="featuredStalls" aria-live="polite"><div class="market-loading">Finding the stalls…</div></div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" aria-labelledby="productsTitle">
       <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">What you can do</p>
-          <h2>One app, three moves</h2>
+        <div class="section-heading heading-row">
+          <div><p class="eyebrow">Fresh from the stalls</p><h2 id="productsTitle">Worth a closer look.</h2><p>New finds from the Tribal Cruize community.</p></div>
+          <a class="text-link" href="shop.html">Shop everything <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="grid grid-3">
-          <article class="card feature">
-            <div class="feature-num">01</div>
-            <h3>Design with AI</h3>
-            <p class="muted">
-              Describe a graphic and watch it land on tees, hoodies, caps, bags and
-              full outfits. Recolor, reposition and export production-ready artwork.
-            </p>
-            <a class="btn btn-sm" href="designer.html">Start designing</a>
-          </article>
-          <article class="card feature">
-            <div class="feature-num">02</div>
-            <h3>Shop the marketplace</h3>
-            <p class="muted">
-              Browse local storefronts, discover independent brands, add pieces to your
-              cart and check out in-app without leaving the experience.
-            </p>
-            <a class="btn btn-sm" href="shop.html">Enter the shop</a>
-          </article>
-          <article class="card feature">
-            <div class="feature-num">03</div>
-            <h3>Sell your brand</h3>
-            <p class="muted">
-              Buy a storefront space, build your catalog, manage orders and confirm
-              payments while your business grows inside the market village.
-            </p>
-            <a class="btn btn-sm btn-primary" href="spaces.html">Get a space</a>
-          </article>
-        </div>
+        <div class="product-showcase" id="featuredProducts" aria-live="polite"><div class="market-loading">Finding something special…</div></div>
       </div>
     </section>
 
-    <section class="section section-alt">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Popular picks</p>
-          <h2>Fresh arrivals from the market</h2>
-        </div>
-        <div class="product-showcase">
-          <article class="product-tile card">
-            <div class="product-art art-one">TEE</div>
-            <div class="product-copy">
-              <span class="micro-label">Streetwear</span>
-              <h3>Cruise Crest Tee</h3>
-              <p>Heavyweight tee with local signature graphics.</p>
-              <strong>K 450.00</strong>
-            </div>
-          </article>
-          <article class="product-tile card">
-            <div class="product-art art-two">HOODIE</div>
-            <div class="product-copy">
-              <span class="micro-label">Limited drop</span>
-              <h3>Night Ride Hoodie</h3>
-              <p>Warm, oversized and made for the city after dark.</p>
-              <strong>K 890.00</strong>
-            </div>
-          </article>
-          <article class="product-tile card">
-            <div class="product-art art-three">CAP</div>
-            <div class="product-copy">
-              <span class="micro-label">Accessorize</span>
-              <h3>Custom 5-Panel Cap</h3>
-              <p>Structured fit with embroidered detailing and texture.</p>
-              <strong>K 350.00</strong>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">How it works</p>
-          <h2>From idea to checkout</h2>
-        </div>
-        <ol class="steps">
-          <li><strong>Design it.</strong> Generate a graphic in the studio and place it on any garment.</li>
-          <li><strong>Claim your space.</strong> Sellers open a storefront and complete local payment onboarding.</li>
-          <li><strong>Stock it.</strong> Add products with photos, prices and descriptions from your dashboard.</li>
-          <li><strong>Sell it.</strong> Shoppers check out in-app and the money moves directly to you.</li>
-        </ol>
-        <div class="cta-row">
-          <a href="spaces.html" class="btn btn-primary">Sell on Tribal Cruize</a>
-          <a href="designer.html" class="btn">Start creating</a>
-        </div>
+    <section class="section maker-section">
+      <div class="container maker-panel">
+        <div><p class="eyebrow">Your stall is waiting</p><h2>Make room for<br />your story.</h2><p>Bring your products and ideas to a market built to celebrate local businesses. Start with a stall, then grow at your pace.</p></div>
+        <div class="maker-actions"><a href="spaces.html" class="btn btn-primary">Open your stall <span aria-hidden="true">→</span></a><a href="designer.html" class="btn">Try the design studio</a></div>
+        <span class="maker-decoration" aria-hidden="true">✳</span>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-content">
-      <p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p>
-      <div>
-        <a href="designer.html">Designer</a>
-        <a href="shop.html">Shop</a>
-        <a href="spaces.html">Sell With Us</a>
-      </div>
-    </div>
+    <div class="container footer-content"><p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p><div><a href="designer.html">Designer</a><a href="shop.html">Market</a><a href="spaces.html">Sell With Us</a></div></div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="tc.js"></script>
+  <script src="marketplace.js"></script>
 </body>
 </html>
