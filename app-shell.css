@@ -1,0 +1,14 @@
+/* Shared shell additions use the existing Tribal Cruize palette from tc.css. */
+.tc-shell-tools { position: relative; display: flex; align-items: center; gap: .55rem; }
+.tc-icon-button { min-width: 38px; min-height: 36px; position: relative; }
+.tc-notification-dot { position: absolute; width: 7px; height: 7px; top: 5px; right: 6px; border-radius: 50%; background: var(--accent); }
+.tc-account-link { display: inline-flex; align-items: center; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: .38rem .75rem; color: var(--muted); font-size: .82rem; }
+.tc-account-link:hover { color: var(--ink); border-color: var(--accent); }
+.tc-popover { position: absolute; z-index: 150; right: 0; top: calc(100% + .7rem); width: min(300px, 85vw); padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: 0 16px 42px rgba(0,0,0,.38); }
+.tc-popover p { margin: .5rem 0; }
+.tc-shell-tools a { color: var(--muted); }
+.tc-shell-tools a:hover { color: var(--ink); }
+@media (max-width: 760px) {
+  .tc-shell-tools { width: 100%; padding: .6rem 0; }
+  .tc-popover { left: 0; right: auto; }
+}

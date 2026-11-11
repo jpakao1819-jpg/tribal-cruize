@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Designs | Tribal Cruize</title><meta name="description" content="Your saved Tribal Cruize clothing designs in one place." />
+  <link rel="icon" type="image/png" href="assets/logo.png" /><link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tc.css" /><link rel="stylesheet" href="workspace.css" />
+</head>
+<body>
+  <header class="site-header"><nav class="navbar container" aria-label="Main navigation"><a href="tribal-cruize.html" class="logo" aria-label="Tribal Cruize home"><img src="assets/logo.png" alt="Tribal Cruize logo" /></a><button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false">☰</button><ul class="nav-links" id="navLinks"><li><a href="tribal-cruize.html">Home</a></li></ul></nav></header>
+  <main class="container workspace-main">
+    <div class="workspace-heading"><div><p class="eyebrow">Creative library</p><h1>My Designs</h1><p class="muted">Your creativity, saved in one place.</p></div><a class="btn btn-primary" href="designer.html">＋ Create new design</a></div>
+    <div class="workspace-controls"><label class="visually-hidden" for="designSearch">Search designs</label><input id="designSearch" type="search" placeholder="Search your designs…" /><label class="visually-hidden" for="designSort">Sort designs</label><select id="designSort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option></select></div>
+    <div class="workspace-grid" id="designGrid" aria-live="polite"></div>
+  </main>
+  <footer class="site-footer"><div class="container footer-content"><p>© <span data-year></span> Tribal Cruize · Made in Papua New Guinea.</p><div><a href="designer.html">3D Studio</a><a href="shop.html">Market</a><a href="account.html">Account</a></div></div></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="tc.js"></script><script src="designs.js"></script>
+</body></html>
